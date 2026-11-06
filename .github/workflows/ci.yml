@@ -23,3 +23,24 @@ jobs:
       - name: Stop calc and its stub
         if: always()
         run: docker compose -f compose.calc.yaml down
+# --- 2\. TEST DI COMPONENTE: STRING --- 
+      - name: Start string and its stub 
+        run: docker compose -f compose.string.yaml up --build -d --wait 
+      - name: Component tests of string 
+        working-directory: tests/bruno 
+        run: bru run string string-stub --env string-component 
+      - name: Stop string and its stub 
+        if: always() 
+        run: docker compose -f compose.string.yaml down 
+# --- 3\. TEST DI INTEGRAZIONE: INTERA APPLICAZIONE --- 
+      - name: Start the whole application 
+        run: docker compose up --build -d --wait 
+      - name: Integration tests 
+        working-directory: tests/bruno 
+        run: bru run calc string --env integration 
+      - name: Show the logs of the application 
+        if: failure() 
+        run: docker compose logs 
+      - name: Stop the whole application 
+        if: always() 
+        run: docker compose down
